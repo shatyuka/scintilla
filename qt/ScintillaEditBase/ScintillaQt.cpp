@@ -282,13 +282,13 @@ void ScintillaQt::SetVerticalScrollPos()
 {
 	Editor::SetVerticalScrollPos();
 	scrollArea->verticalScrollBar()->setValue(topLine);
-	emit verticalScrolled(topLine);
+	Q_EMIT verticalScrolled(topLine);
 }
 
 void ScintillaQt::SetHorizontalScrollPos()
 {
 	scrollArea->horizontalScrollBar()->setValue(xOffset);
-	emit horizontalScrolled(xOffset);
+	Q_EMIT horizontalScrolled(xOffset);
 }
 
 bool ScintillaQt::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage)
@@ -304,7 +304,7 @@ bool ScintillaQt::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage)
 
 		scrollArea->verticalScrollBar()->setMaximum(vMax);
 		scrollArea->verticalScrollBar()->setPageStep(vPage);
-		emit verticalRangeChanged(vMax, vPage);
+		Q_EMIT verticalRangeChanged(vMax, vPage);
 	}
 
 	int hNewPage = GetTextRectangle().Width();
@@ -319,7 +319,7 @@ bool ScintillaQt::ModifyScrollBars(Sci::Line nMax, Sci::Line nPage)
 		scrollArea->horizontalScrollBar()->setMaximum(hMax);
 		scrollArea->horizontalScrollBar()->setPageStep(hPage);
 		scrollArea->horizontalScrollBar()->setSingleStep(charWidth);
-		emit horizontalRangeChanged(hMax, hPage);
+		Q_EMIT horizontalRangeChanged(hMax, hPage);
 	}
 
 	return modified;
@@ -355,7 +355,7 @@ void ScintillaQt::CopyToModeClipboard(const SelectionText &selectedText, QClipbo
 	}
 
 	// Allow client code to add additional data (e.g rich text).
-	emit aboutToCopy(mimeData);
+	Q_EMIT aboutToCopy(mimeData);
 
 	clipboard->setMimeData(mimeData, clipboardMode_);
 }
@@ -416,8 +416,8 @@ void ScintillaQt::ClaimSelection()
 
 void ScintillaQt::NotifyChange()
 {
-	emit notifyChange();
-	emit command(
+	Q_EMIT notifyChange();
+	Q_EMIT command(
 			Platform::LongFromTwoShorts(GetCtrlID(), SCEN_CHANGE),
 			reinterpret_cast<sptr_t>(wMain.GetID()));
 }
@@ -425,7 +425,7 @@ void ScintillaQt::NotifyChange()
 void ScintillaQt::NotifyFocus(bool focus)
 {
 	if (commandEvents) {
-		emit command(
+		Q_EMIT command(
 				Platform::LongFromTwoShorts
 						(GetCtrlID(), focus ? SCEN_SETFOCUS : SCEN_KILLFOCUS),
 				reinterpret_cast<sptr_t>(wMain.GetID()));
@@ -438,7 +438,7 @@ void ScintillaQt::NotifyParent(NotificationData scn)
 {
 	scn.nmhdr.hwndFrom = wMain.GetID();
 	scn.nmhdr.idFrom = GetCtrlID();
-	emit notifyParent(scn);
+	Q_EMIT notifyParent(scn);
 }
 
 void ScintillaQt::NotifyURIDropped(const char *uri)
@@ -858,7 +858,7 @@ void ScintillaQt::Drop(const Point &point, const QMimeData *data, bool move)
 
 void ScintillaQt::DropUrls(const QMimeData *data)
 {
-	foreach(const QUrl &url, data->urls()) {
+	Q_FOREACH(const QUrl &url, data->urls()) {
 		NotifyURIDropped(url.toString().toUtf8().constData());
 	}
 }

@@ -1035,7 +1035,7 @@ void ListBoxImpl::Create(Window &parent,
 
 	int maxIconWidth = 0;
 	int maxIconHeight = 0;
-	foreach (QPixmap im, images) {
+	Q_FOREACH(QPixmap im, images) {
 		im.setDevicePixelRatio(imageScale);
 		if (maxIconWidth < im.width() / im.devicePixelRatio())
 			maxIconWidth = im.width() / im.devicePixelRatio();
@@ -1087,7 +1087,7 @@ int ListBoxImpl::CaretFromEdge()
 {
 	ListWidget *list = GetWidget();
 	int maxIconWidth = 0;
-	foreach (QPixmap im, images) {
+    Q_FOREACH (QPixmap im, images) {
 		if (maxIconWidth < im.width() / im.devicePixelRatio())
 			maxIconWidth = im.width() / im.devicePixelRatio();
 	}
@@ -1267,7 +1267,7 @@ void ListWidget::selectionChanged(const QItemSelection &selected, const QItemSel
 
 int ListWidget::currentSelection() {
 	const QModelIndexList indices = selectionModel()->selectedRows();
-	foreach (const QModelIndex ind, indices) {
+    Q_FOREACH (const QModelIndex ind, indices) {
 		return ind.row();
 	}
 	return -1;

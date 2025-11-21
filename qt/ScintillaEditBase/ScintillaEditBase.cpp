@@ -196,7 +196,7 @@ void ScintillaEditBase::focusOutEvent(QFocusEvent *event)
 void ScintillaEditBase::resizeEvent(QResizeEvent *)
 {
 	sqt->ChangeSize();
-	emit resized();
+	Q_EMIT resized();
 }
 
 void ScintillaEditBase::keyPressEvent(QKeyEvent *event)
@@ -205,7 +205,7 @@ void ScintillaEditBase::keyPressEvent(QKeyEvent *event)
 	// assumed to be shortcuts not handled by scintilla.
 	if (QApplication::keyboardModifiers() & Qt::MetaModifier) {
 		QAbstractScrollArea::keyPressEvent(event);
-		emit keyPressed(event);
+		Q_EMIT keyPressed(event);
 		return;
 	}
 
@@ -275,7 +275,7 @@ void ScintillaEditBase::keyPressEvent(QKeyEvent *event)
 		}
 	}
 
-	emit keyPressed(event);
+	Q_EMIT keyPressed(event);
 }
 
 namespace {
@@ -310,7 +310,7 @@ void ScintillaEditBase::mousePressEvent(QMouseEvent *event)
 {
 	const Point pos = PointFromQPoint(event->pos());
 
-	emit buttonPressed(event);
+	Q_EMIT buttonPressed(event);
 
 	if (event->button() == Qt::MiddleButton &&
 	    QApplication::clipboard()->supportsSelection()) {
@@ -345,8 +345,8 @@ void ScintillaEditBase::mouseReleaseEvent(QMouseEvent *event)
 	const sptr_t line = send(SCI_LINEFROMPOSITION, pos);
 	const int modifiers = QApplication::keyboardModifiers();
 
-	emit textAreaClicked(line, modifiers);
-	emit buttonReleased(event);
+	Q_EMIT textAreaClicked(line, modifiers);
+	Q_EMIT buttonReleased(event);
 }
 
 void ScintillaEditBase::mouseDoubleClickEvent(QMouseEvent *event)
@@ -457,7 +457,7 @@ namespace {
 
 int GetImeCaretPos(QInputMethodEvent *event)
 {
-	foreach (const QInputMethodEvent::Attribute attr, event->attributes()) {
+	Q_FOREACH(const QInputMethodEvent::Attribute attr, event->attributes()) {
 		if (attr.type == QInputMethodEvent::Cursor)
 			return attr.start;
 	}
@@ -467,7 +467,7 @@ int GetImeCaretPos(QInputMethodEvent *event)
 std::vector<int> MapImeIndicators(QInputMethodEvent *event)
 {
 	std::vector<int> imeIndicator(event->preeditString().size(), IndicatorUnknown);
-	foreach (const QInputMethodEvent::Attribute attr, event->attributes()) {
+	Q_FOREACH(const QInputMethodEvent::Attribute attr, event->attributes()) {
 		if (attr.type == QInputMethodEvent::TextFormat) {
 			const QTextFormat format = attr.value.value<QTextFormat>();
 			const QTextCharFormat charFormat = format.toCharFormat();
@@ -678,41 +678,41 @@ QVariant ScintillaEditBase::inputMethodQuery(Qt::InputMethodQuery query) const
 
 void ScintillaEditBase::notifyParent(NotificationData scn)
 {
-	emit notify(&scn);
+	Q_EMIT notify(&scn);
 	switch (scn.nmhdr.code) {
 		case Notification::StyleNeeded:
-			emit styleNeeded(scn.position);
+			Q_EMIT styleNeeded(scn.position);
 			break;
 
 		case Notification::CharAdded:
-			emit charAdded(scn.ch);
+			Q_EMIT charAdded(scn.ch);
 			break;
 
 		case Notification::SavePointReached:
-			emit savePointChanged(false);
+			Q_EMIT savePointChanged(false);
 			break;
 
 		case Notification::SavePointLeft:
-			emit savePointChanged(true);
+			Q_EMIT savePointChanged(true);
 			break;
 
 		case Notification::ModifyAttemptRO:
-			emit modifyAttemptReadOnly();
+			Q_EMIT modifyAttemptReadOnly();
 			break;
 
 		case Notification::Key:
-			emit key(scn.ch);
+			Q_EMIT key(scn.ch);
 			break;
 
 		case Notification::DoubleClick:
-			emit doubleClick(scn.position, scn.line);
+			Q_EMIT doubleClick(scn.position, scn.line);
 			break;
 
 		case Notification::UpdateUI:
 			if (FlagSet(scn.updated, Update::Selection)) {
 				updateMicroFocus();
 			}
-			emit updateUi(scn.updated);
+			Q_EMIT updateUi(scn.updated);
 			break;
 
 		case Notification::Modified:
@@ -725,80 +725,80 @@ void ScintillaEditBase::notifyParent(NotificationData scn)
 			                      (deleted && length == 0);
 
 			if (scn.linesAdded != 0) {
-				emit linesAdded(scn.linesAdded);
+				Q_EMIT linesAdded(scn.linesAdded);
 			} else if (firstLineAdded) {
-				emit linesAdded(added ? 1 : -1);
+				Q_EMIT linesAdded(added ? 1 : -1);
 			}
 
 			const QByteArray bytes = QByteArray::fromRawData(scn.text, scn.text ? scn.length : 0);
-			emit modified(scn.modificationType, scn.position, scn.length,
+			Q_EMIT modified(scn.modificationType, scn.position, scn.length,
 			              scn.linesAdded, bytes, scn.line,
 			              scn.foldLevelNow, scn.foldLevelPrev);
 			break;
 		}
 
 		case Notification::MacroRecord:
-			emit macroRecord(scn.message, scn.wParam, scn.lParam);
+			Q_EMIT macroRecord(scn.message, scn.wParam, scn.lParam);
 			break;
 
 		case Notification::MarginClick:
-			emit marginClicked(scn.position, scn.modifiers, scn.margin);
+			Q_EMIT marginClicked(scn.position, scn.modifiers, scn.margin);
 			break;
 
 		case Notification::NeedShown:
-			emit needShown(scn.position, scn.length);
+			Q_EMIT needShown(scn.position, scn.length);
 			break;
 
 		case Notification::Painted:
-			emit painted();
+			Q_EMIT painted();
 			break;
 
 		case Notification::UserListSelection:
-			emit userListSelection();
+			Q_EMIT userListSelection();
 			break;
 
 		case Notification::URIDropped:
-			emit uriDropped(QString::fromUtf8(scn.text));
+			Q_EMIT uriDropped(QString::fromUtf8(scn.text));
 			break;
 
 		case Notification::DwellStart:
-			emit dwellStart(scn.x, scn.y);
+			Q_EMIT dwellStart(scn.x, scn.y);
 			break;
 
 		case Notification::DwellEnd:
-			emit dwellEnd(scn.x, scn.y);
+			Q_EMIT dwellEnd(scn.x, scn.y);
 			break;
 
 		case Notification::Zoom:
-			emit zoom(send(SCI_GETZOOM));
+			Q_EMIT zoom(send(SCI_GETZOOM));
 			break;
 
 		case Notification::HotSpotClick:
-			emit hotSpotClick(scn.position, scn.modifiers);
+			Q_EMIT hotSpotClick(scn.position, scn.modifiers);
 			break;
 
 		case Notification::HotSpotDoubleClick:
-			emit hotSpotDoubleClick(scn.position, scn.modifiers);
+			Q_EMIT hotSpotDoubleClick(scn.position, scn.modifiers);
 			break;
 
 		case Notification::CallTipClick:
-			emit callTipClick();
+			Q_EMIT callTipClick();
 			break;
 
 		case Notification::AutoCSelection:
-			emit autoCompleteSelection(scn.lParam, sqt->IsUnicodeMode() ? QString::fromUtf8(scn.text) : QString::fromLocal8Bit(scn.text));
+			Q_EMIT autoCompleteSelection(scn.lParam, sqt->IsUnicodeMode() ? QString::fromUtf8(scn.text) : QString::fromLocal8Bit(scn.text));
 			break;
 
 		case Notification::AutoCCancelled:
-			emit autoCompleteCancelled();
+			Q_EMIT autoCompleteCancelled();
 			break;
 
 		case Notification::FocusIn:
-			emit focusChanged(true);
+			Q_EMIT focusChanged(true);
 			break;
 
 		case Notification::FocusOut:
-			emit focusChanged(false);
+			Q_EMIT focusChanged(false);
 			break;
 
 		default:
@@ -808,7 +808,7 @@ void ScintillaEditBase::notifyParent(NotificationData scn)
 
 void ScintillaEditBase::event_command(uptr_t wParam, sptr_t lParam)
 {
-	emit command(wParam, lParam);
+	Q_EMIT command(wParam, lParam);
 }
 
 KeyMod ScintillaEditBase::ModifiersOfKeyboard()

@@ -62,11 +62,11 @@ WatcherHelper::WatcherHelper(ScintillaDocument *owner_) : owner(owner_) {
 }
 
 void WatcherHelper::NotifyModifyAttempt(Document *, void *) {
-    emit owner->modify_attempt();
+    Q_EMIT owner->modify_attempt();
 }
 
 void WatcherHelper::NotifySavePoint(Document *, void *, bool atSavePoint) {
-    emit owner->save_point(atSavePoint);
+    Q_EMIT owner->save_point(atSavePoint);
 }
 
 void WatcherHelper::NotifyModified(Document *, DocModification mh, void *) {
@@ -74,7 +74,7 @@ void WatcherHelper::NotifyModified(Document *, DocModification mh, void *) {
     if (!mh.text)
         length = 0;
     QByteArray ba = QByteArray::fromRawData(mh.text, length);
-    emit owner->modified(mh.position, static_cast<int>(mh.modificationType), ba, length,
+    Q_EMIT owner->modified(mh.position, static_cast<int>(mh.modificationType), ba, length,
 			 mh.linesAdded, mh.line, static_cast<int>(mh.foldLevelNow), static_cast<int>(mh.foldLevelPrev));
 }
 
@@ -82,11 +82,11 @@ void WatcherHelper::NotifyDeleted(Document *, void *) noexcept {
 }
 
 void WatcherHelper::NotifyStyleNeeded(Document *, void *, Sci::Position endPos) {
-    emit owner->style_needed(endPos);
+    Q_EMIT owner->style_needed(endPos);
 }
 
 void WatcherHelper::NotifyErrorOccurred(Document *, void *, Status status) {
-    emit owner->error_occurred(static_cast<int>(status));
+    Q_EMIT owner->error_occurred(static_cast<int>(status));
 }
 
 void WatcherHelper::NotifyGroupCompleted(Document *, void *) noexcept {
